@@ -1,14 +1,34 @@
-import { useState } from 'react';
-import { MessageCircle, Phone, MapPin, Star, Clock, ShieldCheck, HeartHandshake } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MessageCircle, Phone, MapPin, Star, Clock, HeartHandshake, Maximize2, X } from 'lucide-react';
 import { firmData } from '../data/firmData.js';
 
 export default function Hero() {
   const [imgSrc, setImgSrc] = useState(firmData.images.hero);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const handleImageError = () => {
-    // If the Google CDN URL is blocked or expired, smoothly switch to the vetted fallback legal image
+    // If the primary image fails, smoothly switch to the vetted fallback legal image
     setImgSrc(firmData.images.heroFallback);
   };
+
+  // Close lightbox on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setLightboxOpen(false);
+      }
+    };
+    if (lightboxOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [lightboxOpen]);
 
   return (
     <section
@@ -105,55 +125,72 @@ export default function Hero() {
 
           </div>
 
-          {/* Right Column: Visual Composition with Real Image & Floating Cards */}
+          {/* Right Column: Visual Composition with Uncropped Image & Clear Numbers */}
           <div className="lg:col-span-5 relative mt-4 lg:mt-0">
-            <div className="relative mx-auto max-w-md lg:max-w-none">
+            <div className="relative mx-auto max-w-lg lg:max-w-none flex flex-col">
               
-              {/* Image Frame Container */}
-              <div className="relative rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-900 group">
-                <img
-                  src={imgSrc}
-                  onError={handleImageError}
-                  alt="Oneuplegal Law Firm office and consultation premises in Sector 19, Chandigarh"
-                  width="600"
-                  height="400"
-                  className="w-full h-80 sm:h-96 object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                  loading="eager"
-                  referrerPolicy="no-referrer"
-                />
-                
-                {/* Subtle Image Vignette Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent pointer-events-none" />
-
-                {/* Bottom Overlay Label */}
-                <div className="absolute bottom-4 left-4 right-4 p-3 rounded-lg bg-slate-950/80 backdrop-blur-sm border border-slate-800 text-left">
-                  <div className="text-xs font-semibold text-amber-300">Oneuplegal Law Firm Premises</div>
-                  <div className="text-[11px] text-slate-300">Sector 19D, Chandigarh, 160019</div>
-                </div>
-              </div>
-
-              {/* Floating Verified Trust Pill */}
-              <div className="absolute top-3 right-3 sm:-top-4 sm:-right-4 bg-slate-900/95 backdrop-blur-md border border-slate-700 px-3.5 py-2 rounded-xl shadow-xl flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-400 font-bold text-xs">
-                  5.0
-                </div>
-                <div className="text-left">
+              {/* Badges Bar above Image: Prevents blocking the sign board numbers */}
+              <div className="flex flex-wrap items-center justify-between gap-2.5 mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-md">
+                  <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-400 font-bold text-xs">
+                    5.0
+                  </div>
                   <div className="flex items-center text-amber-400 text-xs">
                     {'★'.repeat(5)}
                   </div>
-                  <div className="text-[10px] text-slate-200 font-medium">216 Google Reviews</div>
+                  <span className="text-xs text-slate-200 font-medium">216 Reviews</span>
+                </div>
+
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 shadow-md">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="font-medium text-slate-200">Sector 19D, Chandigarh</span>
                 </div>
               </div>
 
-              {/* Floating Location Badge */}
-              <div className="absolute bottom-3 left-3 sm:-bottom-4 sm:-left-4 bg-slate-900/95 backdrop-blur-md border border-slate-700 px-3.5 py-2 rounded-xl shadow-xl flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <MapPin className="w-4 h-4" />
+              {/* Image Frame Container - Complete 100% Uncropped View */}
+              <div 
+                onClick={() => setLightboxOpen(true)}
+                className="relative rounded-2xl overflow-hidden border border-slate-700/90 shadow-2xl bg-slate-950 group cursor-pointer transition-all hover:border-amber-400/60"
+                title="Click to view full high-resolution sign board"
+              >
+                <img
+                  src={imgSrc}
+                  onError={handleImageError}
+                  alt="Oneuplegal Law Firm sign board and office premises in Sector 19, Chandigarh"
+                  width="1200"
+                  height="673"
+                  className="w-full h-auto aspect-[1200/673] object-contain block bg-slate-950"
+                  loading="eager"
+                  referrerPolicy="no-referrer"
+                />
+
+                {/* Subtle Hover Action Pill */}
+                <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-950/80 backdrop-blur-sm border border-slate-700 px-2.5 py-1 rounded-lg text-[11px] font-medium text-amber-300 flex items-center gap-1.5">
+                  <Maximize2 className="w-3 h-3" />
+                  <span>Expand Sign</span>
                 </div>
-                <div className="text-left text-xs">
-                  <span className="font-semibold text-white block">Sector 19, Chandigarh</span>
-                  <span className="text-[10px] text-slate-300">Plus Code: {firmData.plusCode}</span>
+              </div>
+
+              {/* Bottom Caption & Verification Bar: Outside the image so numbers are 100% readable */}
+              <div className="mt-3 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-left flex items-center justify-between gap-3 shadow-md">
+                <div>
+                  <div className="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
+                    <span>Oneuplegal Law Firm Sign Board</span>
+                  </div>
+                  <div className="text-[11px] text-slate-300">
+                    Official premises view • Full contact details visible
+                  </div>
                 </div>
+                
+                <button
+                  type="button"
+                  onClick={() => setLightboxOpen(true)}
+                  className="inline-flex items-center gap-1.5 text-xs text-amber-300 hover:text-white font-medium py-1.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors shrink-0"
+                  aria-label="View enlarged law firm board image"
+                >
+                  <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Enlarge</span>
+                </button>
               </div>
 
             </div>
@@ -161,6 +198,51 @@ export default function Hero() {
 
         </div>
       </div>
+
+      {/* Full-Screen Lightbox Modal for Ultra-Clear Inspection of the Board */}
+      {lightboxOpen && (
+        <div 
+          role="dialog"
+          aria-modal="true"
+          aria-label="Enlarged Oneuplegal Law Firm Board"
+          className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <div 
+            className="relative max-w-5xl w-full flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Lightbox Header with Close Button */}
+            <div className="w-full flex items-center justify-between pb-3 text-white border-b border-slate-800 mb-3">
+              <div>
+                <h3 className="text-sm sm:text-base font-semibold text-white">Oneuplegal Law Firm Official Sign</h3>
+                <p className="text-xs text-slate-400">Sector 19D, Chandigarh • High-Resolution View</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLightboxOpen(false)}
+                className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                aria-label="Close enlarged view"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Lightbox Image Container */}
+            <div className="w-full rounded-xl overflow-hidden border border-slate-700/80 bg-slate-950 flex items-center justify-center shadow-2xl">
+              <img
+                src={imgSrc}
+                alt="Oneuplegal Law Firm sign board full resolution view"
+                className="w-full max-h-[75vh] object-contain block"
+              />
+            </div>
+
+            <p className="text-xs text-slate-400 mt-2 text-center">
+              Press <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">ESC</kbd> or click anywhere outside to close
+            </p>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
